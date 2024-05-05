@@ -57,8 +57,6 @@ bantime = 2592000
 EOF
 sudo systemctl restart fail2ban
 }
-
-# Вызываем функцию для настройки SSH и fail2ban
 setup_ssh_and_fail2ban
 
 # Отключение двухстороннего пинга
@@ -88,8 +86,6 @@ sudo ufw allow $PORT
 
 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) < <(echo -e "y\n$USERNAME\n$PASSWORD\n$PORT")
 }
-
-# Вызов функции для установки 3X-UI
 install_3x_ui
 
 print_info() {
