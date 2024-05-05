@@ -75,6 +75,12 @@ PORT=4500
 
 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) < <(echo -e "y\n$USERNAME\n$PASSWORD\n$PORT")
 
+# Вывод инфы
+echo -e "${YELLOW}SSH Port:${RESET} $RANDOM_PORT"
+echo -e "${YELLOW}Username:${RESET} $USERNAME"
+echo -e "${YELLOW}Password:${RESET} $PASSWORD"
+echo -e "${YELLOW}3X-UI Port:${RESET} $PORT"
+
 # Запрос на продолжение
 read -p "Do you want to continue with system update and cleanup? [y/n]: " choice
 if [ "$choice" = "y" ]; then
