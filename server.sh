@@ -5,12 +5,12 @@ YELLOW='\e[93m'
 # Сброс цвета
 RESET='\e[0m'
 
-# Генерация случайного порта от 10000 до 65535
-RANDOM_PORT=$((10000 + RANDOM % 55536))
-
 # Обновление ПО
 echo -e "${YELLOW}Updating system packages...${RESET}"
 apt update && apt upgrade -y
+
+# Установка UFW
+setup_ufw() {
 
 # Установка UFW
 echo -e "${YELLOW}Installing UFW...${RESET}"
@@ -19,18 +19,26 @@ apt install ufw -y
 # Включение UFW
 echo -e "${YELLOW}Enabling UFW...${RESET}"
 echo "y" | sudo ufw enable
+}
+setup_ufw
 
 # Установка nano
 echo -e "${YELLOW}Installing nano...${RESET}"
 apt install nano -y
 
-# SSH
+# Защита SSH
+setup_ssh_and_fail2ban() {
+
+# Генерация случайного порта для SSH
+RANDOM_PORT=$((10000 + RANDOM % 55536))
+    
+# Конфигурация SSH
 echo -e "${YELLOW}Configuring SSH...${RESET}"
 sudo sed -i "s/#Port 22/Port $RANDOM_PORT/" /etc/ssh/sshd_config
 sudo ufw allow $RANDOM_PORT
 sudo systemctl restart sshd
-
-# fail2ban
+    
+# Установка и настройка fail2ban
 echo -e "${YELLOW}Installing and configuring fail2ban...${RESET}"
 apt install fail2ban -y
 touch /etc/fail2ban/jail.local
@@ -48,16 +56,17 @@ maxretry = 2
 bantime = 2592000
 EOF
 sudo systemctl restart fail2ban
+}
+
+# Вызываем функцию для настройки SSH и fail2ban
+setup_ssh_and_fail2ban
 
 # Отключение двухстороннего пинга
 echo -e "${YELLOW}Disabling ping...${RESET}"
 sudo sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/' /etc/ufw/before.rules
 
-# Разрешение порта 4500
-echo -e "${YELLOW}Allowing port 4500...${RESET}"
-sudo ufw allow 4500
-sudo ufw reload
-
+# Установка панели 3X-UI
+install_3x_ui() {
 # Установка панели 3X-UI
 echo -e "${YELLOW}Installing 3X-UI panel...${RESET}"
 
@@ -73,13 +82,23 @@ PASSWORD=$(openssl rand -base64 10 | tr -d '=')
 # Порт для панели 3X-UI (постоянное значение)
 PORT=4500
 
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) < <(echo -e "y\n$USERNAME\n$PASSWORD\n$PORT")
+# Разрешение порта 4500
+echo -e "${YELLOW}Allowing port 4500...${RESET}"
+sudo ufw allow $PORT
 
-# Вывод инфы
+bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) < <(echo -e "y\n$USERNAME\n$PASSWORD\n$PORT")
+}
+
+# Вызов функции для установки 3X-UI
+install_3x_ui
+
+print_info() {
 echo -e "${YELLOW}SSH Port:${RESET} $RANDOM_PORT"
 echo -e "${YELLOW}Username:${RESET} $USERNAME"
 echo -e "${YELLOW}Password:${RESET} $PASSWORD"
 echo -e "${YELLOW}3X-UI Port:${RESET} $PORT"
+}
+print_info
 
 # Запрос на продолжение
 read -p "Do you want to continue with system update and cleanup? [y/n]: " choice
