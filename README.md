@@ -10,8 +10,9 @@
 
 curl -sSL <Ссылка> | sudo bash
 
+Замените `<Ссылка>` на URL, с которого вы хотите загрузить и запустить скрипт.
+
 Пример: 
 ```
 curl -sSL  https://raw.githubusercontent.com/Ddarkover/Prosto/main/server.sh  | sudo bash
 ```
-Замените `<Ссылка>` на URL, с которого вы хотите загрузить и запустить скрипт.
