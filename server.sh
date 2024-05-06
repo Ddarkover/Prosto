@@ -99,8 +99,6 @@ continue_x_ui() {
         echo -e "${YELLOW}Skipping 3X-UI panel installation.${RESET}"
     fi
 }
-
-# Вызываем функцию continue_x_ui только после всех необходимых операций
 continue_x_ui
 
 print_info() {
