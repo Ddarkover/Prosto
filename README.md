@@ -16,5 +16,4 @@ curl -sSL <Ссылка> | sudo bash
 ### Пример
 ```
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Ddarkover/Prosto/main/server.sh)"
-
 ```
