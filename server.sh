@@ -35,7 +35,7 @@ RANDOM_SSH_PORT=$((10000 + RANDOM % 55536))
 # Конфигурация SSH
 echo -e "${YELLOW}Configuring SSH...${RESET}"
 sudo sed -i "s/#Port 22/Port $RANDOM_SSH_PORT/" /etc/ssh/sshd_config
-sudo ufw allow $RANDOM_SSH_PORT
+sudo ufw allow "$RANDOM_SSH_PORT"
 sudo systemctl restart sshd
     
 # Установка и настройка fail2ban
@@ -81,7 +81,7 @@ install_3x_ui() {
 
     # Разрешение порта 3X-UI
     echo -e "${YELLOW}Allowing port $RANDOM_PORT for 3X-UI...${RESET}"
-    sudo ufw allow $RANDOM_PORT
+    sudo ufw allow "$RANDOM_PORT"
 
     # Отключение двухстороннего пинга
     echo -e "${YELLOW}Disabling ping...${RESET}"
@@ -92,7 +92,7 @@ install_3x_ui() {
 }
 # Функция для запроса продолжения
 continue_x_ui() {
-    read -p "Do you want to continue with installing 3X-UI panel? [y/n]: " choice
+    read -rp "Do you want to continue with installing 3X-UI panel? [y/n]: " choice
     if [ "$choice" = "y" ]; then
         install_3x_ui
     else
@@ -111,7 +111,7 @@ print_info
 
 # Функция для запроса продолжения
 continue_end() {
-    read -p "Do you want to continue with system update and cleanup? [y/n]: " choice
+    read -rp "Do you want to continue with system update and cleanup? [y/n]: " choice
     if [ "$choice" = "y" ]; then
         # Обновление и очистка
         echo -e "${YELLOW}Updating system packages and cleaning up...${RESET}"
