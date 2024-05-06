@@ -91,7 +91,7 @@ install_3x_ui() {
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) < <(echo -e "y\n$USERNAME\n$PASSWORD\n$RANDOM_PORT")
 }
 # Функция для запроса продолжения
-continue_x-ui() {
+continue_x_ui() {
     read -p "Do you want to continue with installing 3X-UI panel? [y/n]: " choice
     if [ "$choice" = "y" ]; then
         install_3x_ui
@@ -99,7 +99,9 @@ continue_x-ui() {
         echo -e "${YELLOW}Skipping 3X-UI panel installation.${RESET}"
     fi
 }
-continue_x-ui
+
+# Вызываем функцию continue_x_ui только после всех необходимых операций
+continue_x_ui
 
 print_info() {
 echo -e "${YELLOW}SSH Port:${RESET} $RANDOM_SSH_PORT"
