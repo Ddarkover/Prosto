@@ -61,63 +61,38 @@ setup_ssh_and_fail2ban
 
 # Установка панели 3X-UI
 install_3x_ui() {
-    # Генерация случайных цифр
-    RANDOM_NUMBERS=$(shuf -i 1000-9999 -n 1)
-
-    # Генерация случайного порта для 3X-UI (не совпадающего с портом SSH)
-    while :
-    do
-        RANDOM_PORT=$((10000 + RANDOM % 55536))
-        if [ "$RANDOM_PORT" != "$RANDOM_SSH_PORT" ]; then
-            break
-        fi
-    done
-
-    # Формирование имени пользователя
-    USERNAME="prosto$RANDOM_NUMBERS"
-
-    # Генерация случайного пароля длиной 10 символов и удаление символов '='
-    PASSWORD=$(openssl rand -base64 10 | tr -d '=')
-
     # Разрешение порта 3X-UI
-    echo -e "${YELLOW}Allowing port $RANDOM_PORT for 3X-UI...${RESET}"
-    sudo ufw allow "$RANDOM_PORT"
+    echo -e "${YELLOW}Allowing port 2053 for 3X-UI...${RESET}"
+    sudo ufw allow 2053
 
     # Отключение двухстороннего пинга
     echo -e "${YELLOW}Disabling ping...${RESET}"
     sudo sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/' /etc/ufw/before.rules
 
-    # Запуск скрипта установки 3X-UI с передачей сгенерированных данных
-    bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) < <(echo -e "y\n$USERNAME\n$PASSWORD\n$RANDOM_PORT")
+    # Запуск скрипта установки 3X-UI с передачей "n"
+    bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) <<< "n"
 }
-# Функция для запроса продолжения
-continue_x_ui() {
-    read -rp "Do you want to continue with installing 3X-UI panel? [y/n]: " choice
-    if [ "$choice" = "y" ]; then
-        install_3x_ui
-    else
-        echo -e "${YELLOW}Skipping 3X-UI panel installation.${RESET}"
-    fi
-}
-continue_x_ui
 
+# Запрос продолжения установки 3X-UI панели
+read -rp "Do you want to continue with installing 3X-UI panel? [y/n]: " choice
+if [ "$choice" = "y" ]; then
+    install_3x_ui
+else
+    echo -e "${YELLOW}Skipping 3X-UI panel installation.${RESET}"
+fi
+
+# Вывод информации
 print_info() {
-echo -e "${YELLOW}SSH Port:${RESET} $RANDOM_SSH_PORT"
-echo -e "${YELLOW}Username:${RESET} $USERNAME"
-echo -e "${YELLOW}Password:${RESET} $PASSWORD"
-echo -e "${YELLOW}3X-UI Port:${RESET} $RANDOM_PORT"
+    echo -e "${YELLOW}SSH Port:${RESET} $RANDOM_SSH_PORT"
 }
 print_info
 
-# Функция для запроса продолжения
-continue_end() {
-    read -rp "Do you want to continue with system update and cleanup? [y/n]: " choice
-    if [ "$choice" = "y" ]; then
-        # Обновление и очистка
-        echo -e "${YELLOW}Updating system packages and cleaning up...${RESET}"
-        apt update && apt upgrade -y && apt autoclean -y && apt clean -y && apt autoremove -y
-    else
-        echo -e "${YELLOW}Exiting without system update and cleanup.${RESET}"
-    fi
-}
-continue_end
+# Запрос продолжения обновления и очистки системы
+read -rp "Do you want to continue with system update and cleanup? [y/n]: " choice
+if [ "$choice" = "y" ]; then
+    # Обновление и очистка
+    echo -e "${YELLOW}Updating system packages and cleaning up...${RESET}"
+    apt update && apt upgrade -y && apt autoclean -y && apt clean -y && apt autoremove -y
+else
+    echo -e "${YELLOW}Exiting without system update and cleanup.${RESET}"
+fi
