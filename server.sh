@@ -5,44 +5,39 @@ YELLOW='\e[93m'
 # Сброс цвета
 RESET='\e[0m'
 
+# Функция для вывода сообщений с цветом
+echo_yellow() {
+    echo -e "${YELLOW}$1${RESET}"
+}
+
 # Обновление ПО
-echo -e "${YELLOW}Updating system packages...${RESET}"
+echo_yellow "Updating system packages..."
 apt update && apt upgrade -y
 
-# Установка UFW
+# Установка UFW и его настройка
 setup_ufw() {
-
-# Установка UFW
-echo -e "${YELLOW}Installing UFW...${RESET}"
-apt install ufw -y
-
-# Включение UFW
-echo -e "${YELLOW}Enabling UFW...${RESET}"
-echo "y" | sudo ufw enable
+    echo_yellow "Installing and enabling UFW..."
+    apt install ufw -y
+    echo "y" | ufw enable
 }
 setup_ufw
 
 # Установка nano
-echo -e "${YELLOW}Installing nano...${RESET}"
+echo_yellow "Installing nano..."
 apt install nano -y
 
-# Защита SSH
+# Защита SSH и настройка fail2ban
 setup_ssh_and_fail2ban() {
-
-# Генерация случайного порта для SSH
-RANDOM_SSH_PORT=$((10000 + RANDOM % 55536))
+    RANDOM_SSH_PORT=$((10000 + RANDOM % 55536))
     
-# Конфигурация SSH
-echo -e "${YELLOW}Configuring SSH...${RESET}"
-sudo sed -i "s/#Port 22/Port $RANDOM_SSH_PORT/" /etc/ssh/sshd_config
-sudo ufw allow "$RANDOM_SSH_PORT"
-sudo systemctl restart sshd
+    echo_yellow "Configuring SSH..."
+    sed -i "s/#Port 22/Port $RANDOM_SSH_PORT/" /etc/ssh/sshd_config
+    ufw allow "$RANDOM_SSH_PORT"
+    systemctl restart sshd
     
-# Установка и настройка fail2ban
-echo -e "${YELLOW}Installing and configuring fail2ban...${RESET}"
-apt install fail2ban -y
-touch /etc/fail2ban/jail.local
-cat << EOF > /etc/fail2ban/jail.local
+    echo_yellow "Installing and configuring fail2ban..."
+    apt install fail2ban -y
+    cat << EOF > /etc/fail2ban/jail.local
 [DEFAULT]
 ignoreip = 217.118.91.0/24
 
@@ -55,21 +50,18 @@ findtime = 3600
 maxretry = 2
 bantime = 2592000
 EOF
-sudo systemctl restart fail2ban
+    systemctl restart fail2ban
 }
 setup_ssh_and_fail2ban
 
 # Установка панели 3X-UI
 install_3x_ui() {
-    # Разрешение порта 3X-UI
-    echo -e "${YELLOW}Allowing port 2053 for 3X-UI...${RESET}"
-    sudo ufw allow 2053
+    echo_yellow "Allowing port 2053 for 3X-UI..."
+    ufw allow 2053
 
-    # Отключение двухстороннего пинга
-    echo -e "${YELLOW}Disabling ping...${RESET}"
-    sudo sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/' /etc/ufw/before.rules
+    echo_yellow "Disabling ping..."
+    sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/' /etc/ufw/before.rules
 
-    # Запуск скрипта установки 3X-UI с передачей "n"
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) <<< "n"
 }
 
@@ -78,21 +70,17 @@ read -rp "Do you want to continue with installing 3X-UI panel? [y/n]: " choice
 if [ "$choice" = "y" ]; then
     install_3x_ui
 else
-    echo -e "${YELLOW}Skipping 3X-UI panel installation.${RESET}"
+    echo_yellow "Skipping 3X-UI panel installation."
 fi
 
 # Вывод информации
-print_info() {
-    echo -e "${YELLOW}SSH Port:${RESET} $RANDOM_SSH_PORT"
-}
-print_info
+echo_yellow "SSH Port: $RANDOM_SSH_PORT"
 
 # Запрос продолжения обновления и очистки системы
 read -rp "Do you want to continue with system update and cleanup? [y/n]: " choice
 if [ "$choice" = "y" ]; then
-    # Обновление и очистка
-    echo -e "${YELLOW}Updating system packages and cleaning up...${RESET}"
+    echo_yellow "Updating system packages and cleaning up..."
     apt update && apt upgrade -y && apt autoclean -y && apt clean -y && apt autoremove -y
 else
-    echo -e "${YELLOW}Exiting without system update and cleanup.${RESET}"
+    echo_yellow "Exiting without system update and cleanup."
 fi
