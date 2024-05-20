@@ -1,13 +1,18 @@
 #!/bin/bash
 
-# Создание нового пользователя dark
-sudo adduser --gecos "" dark <<EOF
-HRz3q]btP6hb.pxdo3F!9gj+c
-HRz3q]btP6hb.pxdo3F!9gj+c
-EOF
+# Установка имени пользователя
+USERNAME="dark"
 
-# Добавление пользователя в группу sudo
-sudo usermod -aG sudo dark
+# Генерация случайного пароля без символов '='
+PASSWORD=$(openssl rand -base64 16 | tr -d '=')
 
-# Поиск всех групп, начинающихся с "sudo" в файле /etc/group
-grep -i '^sudo' /etc/group
+# Создание нового пользователя с заданным именем и случайным паролем, добавление его в группу sudo
+sudo adduser --gecos "" --disabled-password "$USERNAME"
+echo "$USERNAME:$PASSWORD" | sudo chpasswd
+sudo usermod -aG sudo "$USERNAME"
+
+# Вывод сгенерированного пароля для пользователя
+echo "Сгенерированный пароль для пользователя $USERNAME: $PASSWORD"
+
+# Поиск группы root с помощью getent
+getent group root
