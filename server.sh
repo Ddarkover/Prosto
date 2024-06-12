@@ -48,7 +48,7 @@ action = iptables-allports[name=SSH, port=$RANDOM_SSH_PORT, protocol=tcp]
 logpath = /var/log/auth.log
 findtime = 3600
 maxretry = 2
-bantime = 2592000
+bantime = -1
 EOF
     systemctl restart fail2ban
 }
