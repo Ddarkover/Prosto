@@ -14,5 +14,5 @@ sudo usermod -aG sudo "$USERNAME"
 # Вывод сгенерированного пароля для пользователя
 echo "Сгенерированный пароль для пользователя $USERNAME: $PASSWORD"
 
-# Поиск группы root с помощью getent
+# Поиск группы root с помощью grep
 grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' '\n'
