@@ -15,4 +15,4 @@ sudo usermod -aG sudo "$USERNAME"
 echo "Сгенерированный пароль для пользователя $USERNAME: $PASSWORD"
 
 # Поиск группы root с помощью getent
-getent group root
+grep '^sudo:' /etc/group | cut -d: -f4 | tr ',' '\n'
