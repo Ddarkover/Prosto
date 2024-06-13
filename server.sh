@@ -5,7 +5,7 @@ YELLOW='\e[93m'
 # Сброс цвета
 RESET='\e[0m'
 
-# Функция для вывода сообщений с цветом
+# Вывод сообщений с цветом
 echo_yellow() {
     echo -e "${YELLOW}$1${RESET}"
 }
@@ -14,19 +14,16 @@ echo_yellow() {
 echo_yellow "Updating system packages..."
 apt update && apt upgrade -y
 
-# Установка UFW и его настройка
-setup_ufw() {
-    echo_yellow "Installing and enabling UFW..."
-    apt install ufw -y
-    echo "y" | ufw enable
-}
-setup_ufw
+# Установка UFW
+echo_yellow "Installing and enabling UFW..."
+apt install ufw -y
+echo "y" | ufw enable
 
 # Установка nano
 echo_yellow "Installing nano..."
 apt install nano -y
 
-# Защита SSH и настройка fail2ban
+# Изменения порта SSH и установка fail2ban и его настройка
 setup_ssh_and_fail2ban() {
     RANDOM_SSH_PORT=$((10000 + RANDOM % 55536))
     
@@ -38,9 +35,6 @@ setup_ssh_and_fail2ban() {
     echo_yellow "Installing and configuring fail2ban..."
     apt install fail2ban -y
     cat << EOF > /etc/fail2ban/jail.local
-[DEFAULT]
-ignoreip = 217.118.91.0/24
-
 [sshd]
 enabled = true
 filter = sshd
