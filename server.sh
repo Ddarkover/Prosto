@@ -40,7 +40,7 @@ enabled = true
 filter = sshd
 action = iptables-allports[name=SSH, port=$RANDOM_SSH_PORT, protocol=tcp]
 logpath = /var/log/auth.log
-findtime = 86400
+findtime = 24h
 maxretry = 2
 bantime = -1
 EOF
